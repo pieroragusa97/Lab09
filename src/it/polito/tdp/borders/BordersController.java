@@ -6,6 +6,12 @@ package it.polito.tdp.borders;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultEdge;
+
+import it.polito.tdp.borders.model.Country;
+import it.polito.tdp.borders.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,6 +19,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
 public class BordersController {
+	Model model=new Model();
 
     @FXML // ResourceBundle that was given to the FXMLLoader
     private ResourceBundle resources;
@@ -32,13 +39,21 @@ public class BordersController {
     @FXML
     void doCalcolaConfini(ActionEvent event) {
         if(btnCalcola.isArmed()) {
+        	txtResult.clear();
         	try {
         		int anno=Integer.parseInt(txtAnno.getText());
         		if(anno<1816||anno>2006) {
         			txtResult.appendText("inserisci un numero valido");
         		}
+        		else {
+        			Graph<Country,DefaultEdge> grafo=model.creaGrafo(anno);
+        			for(Country c:grafo.vertexSet()) {
+        				txtResult.appendText(c.getNomeCompleto() + ":   "+model.calcolaGrado(c, grafo)+"\n");
+        			}
+        			txtResult.appendText("numero componenti connesse: "+model.getNumeroComponentiConnesse(grafo));
+        		}
         	}catch(NumberFormatException e) {
-        		txtResult.appendText("inserisci un numero valido");
+        		txtResult.appendText("inserimento non valido");
         	}
         }
     }
@@ -50,4 +65,9 @@ public class BordersController {
         assert txtResult != null : "fx:id=\"txtResult\" was not injected: check your FXML file 'Borders.fxml'.";
 
     }
+
+	public void setModel(Model model) {
+		this.model = model;
+	}
+    
 }
